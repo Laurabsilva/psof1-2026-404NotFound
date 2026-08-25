@@ -1,17 +1,27 @@
-A API do Back-End é o "cérebro" do site da clínica Med Life. Ela recebe as informações enviadas pelas telas, faz as validações exigidas e salva ou busca tudo no banco de dados.
-Funcionalidades e Regras de Negócio do Back-End
-Rota: /cadastrarPaciente
-Recebe as informações do formulário de cadastro do paciente.
-Regra de Negócio: O Back-End faz um IF checando se o paciente é vacinado. Se não for, bloqueia e retorna erro. Depois, faz outro IF verificando se o convênio é Unimed, SUS ou Samaritano. Se for outro convênio, bloqueia e retorna erro. Se passar nas duas verificações, salva o cadastro e a foto/aparência do paciente no banco.
-Rota: /agendarConsulta
-Recebe o pedido de agendamento de consulta online.
-Regra de Negócio: O Back-End salva o agendamento no banco e aciona o sistema para enviar uma notificação de confirmação da consulta para o paciente.
-Rota: /consultarHistorico
-Busca o histórico médico e prontuário dos pacientes.
-Regra de Negócio: O Back-End faz um IF verificando o tipo de usuário. Se for "Médico" ou "Dona", libera o acesso às informações médicas. Se for outro perfil, retorna erro de acesso negado (403).
-Rota: /acessoTotal
-Libera todas as funções administrativas e financeiras do sistema.
-Regra de Negócio: O Back-End faz um IF verificando o usuário logado. Se for a "Dona", libera o sistema completo. Se for um "Médico" ou qualquer outro usuário, retorna erro de acesso negado.
-Rota: /pagarConsulta
-Recebe a confirmação de pagamento da consulta no site.
-Regra de Negócio: O Back-End valida se o pagamento foi concluído, registra a transação financeira no banco de dados e muda o status da consulta para "Paga".
+A API do Back-End funciona como o "cérebro" da aplicação MedLife. Ela conecta as telas desenhadas no Figma com o banco de dados, garantindo que as informações só sejam salvas se seguirem todas as regras da clínica.
+1. Login e Controle de Acesso
+Rota: /login (Reflete as Telas 2 e 3 do Figma)
+O que faz: Autentica o usuário e identifica se ele é paciente, médico ou a dona da clínica.
+Regra de Negócio:
+O Back-End faz um IF checando o perfil do usuário logado.
+Se for a Dona, libera o acesso total ao sistema (telas administrativas, financeiras e médicas).
+Se for Médico, o Back-End bloqueia a visão financeira e libera apenas o acesso ao histórico médico e prontuário dos pacientes.
+2. Cadastro do Paciente
+Rota: /cadastrarPaciente (Reflete as Telas 4 e 5 do Figma)
+O que faz: Recebe as informações do formulário de cadastro.
+Regra de Negócio:
+Validação de Vacina: O Back-End faz um IF checando a opção de vacinação. Se estiver como "não vacinado", o cadastro é cancelado e o sistema exibe uma mensagem de bloqueio.
+Validação de Convênio: O Back-End faz um IF para checar o convênio digitado. O cadastro só é aceito se for Unimed, SUS ou Samaritano. Qualquer outro convênio é rejeitado.
+Se passar pelas duas verificações, a API salva os dados do paciente (incluindo as informações de aparência física e histórico).
+3. Agendamento da Consulta
+Rota: /agendarConsulta (Reflete as Telas 7, 8 e 9 do Figma)
+O que faz: Registra a marcação de consultas online com o médico, data e horário escolhidos.
+Regra de Negócio:
+O Back-End faz um IF checando se a data e o horário selecionados estão livres na agenda do médico.
+Se o horário estiver livre, a API grava a consulta e dispara uma notificação de confirmação para o paciente.
+4. Pagamento e Confirmação
+Rota: /pagarConsulta (Reflete as Telas 10 e 11 do Figma)
+O que faz: Registra o pagamento e finaliza o agendamento da consulta.
+Regra de Negócio:
+O Back-End faz um IF para validar o pagamento realizado no site.
+Se o pagamento for aprovado, ele salva a transação no banco de dados, altera o status da consulta para "Paga/Confirmada" e direciona para a tela de mensagem final.
